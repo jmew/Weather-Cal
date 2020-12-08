@@ -2254,7 +2254,7 @@ const weatherCal = {
     }
     // Circle character.
     if (shape == "circle") {
-      return "\u2B24"
+      return "\u2BCB"
     }
     // Default to the rectangle.
     return "\u2759" 
