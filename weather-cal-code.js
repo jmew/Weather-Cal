@@ -1016,7 +1016,7 @@ const weatherCal = {
       if (calendars.length && !calendars.includes(event.calendar.title)) { return false }
 
       // Hack to remove canceled Office 365 events.
-      if (event.title.startsWith("Canceled:")) { return false }
+      if (event.title != null && event.title.startsWith("Canceled:")) { return false }
 
       // If it's an all-day event, only show if the setting is active.
       if (event.isAllDay) { return eventSettings.showAllDay }
@@ -1511,7 +1511,7 @@ const weatherCal = {
       const showTime = !event.isAllDay
 
       // Set up the title.
-      const title = this.provideText(event.title.trim(), titleStack, this.format.eventTitle)
+      const title = this.provideText(event?.title?.trim() ?? "No meeting title", titleStack, this.format.eventTitle)
       const titlePadding = (showLocation || showTime) ? this.padding/5 : this.padding
       titleStack.setPadding(this.padding, this.padding, titlePadding, this.padding)
 
