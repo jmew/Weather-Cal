@@ -1314,7 +1314,7 @@ const weatherCal = {
     }
 
     // If it's an error, treat it as a null value.
-    if (typeof weatherDataRaw !== 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
+    if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
 
     // English continues using the "main" weather description.
     const english = (this.locale.split("_")[0] == "en")
