@@ -1218,53 +1218,6 @@ const weatherCal = {
     }
   },
 
-  // Set up the sun data object.
-  async setupSunrise() {
-
-    // Requirements: location
-    if (!this.data.location) { await this.setupLocation() }
-
-    let data = this.data
-    async function getSunData(date) {
-      const req = "https://api.sunrise-sunset.org/json?lat=" + data.location.latitude + "&lng=" + data.location.longitude + "&formatted=0&date=" + date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate()
-      const sunData = await new Request(req).loadJSON()
-      return sunData
-    }
-
-    // Set up the sunrise/sunset cache.
-    const sunCachePath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-sunrise")
-    const sunCacheExists = this.fm.fileExists(sunCachePath)
-    const sunCacheDate = sunCacheExists ? this.fm.modificationDate(sunCachePath) : 0
-    let sunDataRaw
-
-    // If cache exists and was created today, use cached data.
-    if (sunCacheExists && this.sameDay(this.now, sunCacheDate)) {
-      const sunCache = this.fm.readString(sunCachePath)
-      sunDataRaw = JSON.parse(sunCache)
-    }
-
-    // Otherwise, get the data from the server.
-    else {
-
-      sunDataRaw = await getSunData(this.now)
-
-      // Calculate tomorrow's date and get tomorrow's data.
-      let tomorrowDate = new Date()
-      tomorrowDate.setDate(this.now.getDate() + 1)
-      const tomorrowData = await getSunData(tomorrowDate)
-      sunDataRaw.results.tomorrow = tomorrowData.results.sunrise
-
-      // Cache the file.
-      this.fm.writeString(sunCachePath, JSON.stringify(sunDataRaw))
-    }
-
-    // Store the timing values.
-    this.data.sun = {}
-    this.data.sun.sunrise = new Date(sunDataRaw.results.sunrise).getTime()
-    this.data.sun.sunset = new Date(sunDataRaw.results.sunset).getTime()
-    this.data.sun.tomorrow = new Date(sunDataRaw.results.tomorrow).getTime()
-  },
-
   // Set up the weather data object.
   async setupWeather() {
 
@@ -1336,31 +1289,6 @@ const weatherCal = {
     this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
     this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
-
-  // Set up the COVID data object.
-  async setupCovid() {
-
-    // Set up the COVID cache.
-    const cacheCovidPath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-covid")
-    const cacheCovidExists = this.fm.fileExists(cacheCovidPath)
-    const cacheCovidDate = cacheCovidExists ? this.fm.modificationDate(cacheCovidPath) : 0
-    let covidDataRaw
-
-    // If cache exists and it's been less than 900 seconds (15min) since last request, use cached data.
-    if (cacheCovidExists && (this.now.getTime() - cacheCovidDate.getTime()) < 900000) {
-      const cacheCovid = this.fm.readString(cacheCovidPath)
-      covidDataRaw = JSON.parse(cacheCovid)
-
-    // Otherwise, use the API to get new data.
-    } else {
-      const covidReq = "https://coronavirus-19-api.herokuapp.com/countries/" + this.settings.covid.country
-      covidDataRaw = await new Request(covidReq).loadJSON()
-      this.fm.writeString(cacheCovidPath, JSON.stringify(covidDataRaw))
-    }
-
-    this.data.covid = covidDataRaw
-  },
-
   /*
    * WIDGET ITEMS
    * These functions display items on the widget.
@@ -1677,13 +1605,12 @@ const weatherCal = {
   // Display the current weather.
   async current(column) {
 
-    // Requirements: location, weather, and sunrise
+    // Requirements: location, weather
     if (!this.data.location) { await this.setupLocation() }
     if (!this.data.weather) { await this.setupWeather() }
-    if (!this.data.sun) { await this.setupSunrise() }
 
     // Get the relevant data and weather settings.
-    const [locationData, weatherData, sunData] = [this.data.location, this.data.weather, this.data.sun]
+    const [locationData, weatherData, ] = [this.data.location, this.data.weather]
     const weatherSettings = this.settings.weather
 
     // Set up the current weather stack.
@@ -1762,13 +1689,12 @@ const weatherCal = {
   // Display upcoming weather.
   async future(column) {
 
-    // Requirements: location, weather, and sunrise
+    // Requirements: location, weather
     if (!this.data.location) { await this.setupLocation() }
     if (!this.data.weather) { await this.setupWeather() }
-    if (!this.data.sun) { await this.setupSunrise() }
 
     // Get the relevant data and weather settings.
-    const [locationData, weatherData, sunData] = [this.data.location, this.data.weather, this.data.sun]
+    const [locationData, weatherData] = [this.data.location, this.data.weather]
     const weatherSettings = this.settings.weather
 
     // Set up the future weather stack.
@@ -1854,13 +1780,12 @@ const weatherCal = {
   // Display forecast weather.
   async forecast(column, hourly = false) {
 
-    // Requirements: location, weather, and sunrise
+    // Requirements: location, weather
     if (!this.data.location) { await this.setupLocation() }
     if (!this.data.weather) { await this.setupWeather() }
-    if (!this.data.sun) { await this.setupSunrise() }
 
     // Get the relevant data and weather settings.
-    const [locationData, weatherData, sunData] = [this.data.location, this.data.weather, this.data.sun]
+    const [locationData, weatherData] = [this.data.location, this.data.weather]
     const weatherSettings = this.settings.weather
 
     let startIndex = hourly ? 1 : (weatherSettings.showToday ? 1 : 2)
@@ -2031,72 +1956,6 @@ const weatherCal = {
     this.provideText(batteryLevel + "%", batteryStack, this.format.battery)
   },
 
-  // Show the sunrise or sunset time.
-  async sunrise(column, showSunset = false) {
-
-    // Requirements: sunrise
-    if (!this.data.sun) { await this.setupSunrise() }
-
-    // Get the sunrise data and settings.
-    const sunData = this.data.sun
-    const sunSettings = this.settings.sunrise
-
-    const sunrise = sunData.sunrise
-    const sunset = sunData.sunset
-    const tomorrow = sunData.tomorrow
-    const current = this.now.getTime()
-
-    const showWithin = parseInt(sunSettings.showWithin)
-    const nearSunrise = this.closeTo(sunrise) <= showWithin
-    const nearSunset = this.closeTo(sunset) <= showWithin
-
-    // If we only show sometimes and we're not close, return.
-    if (showWithin > 0 && !nearSunrise && !nearSunset) { return }
-
-    // Otherwise, determine which time to show.
-    let timeToShow, symbolName
-    const halfHour = 30 * 60 * 1000
-
-    // Determine logic for when to show sunset for a combined element.
-    const combinedSunset = current > sunrise + halfHour && current < sunset + halfHour
-
-    // Determine if we should show the sunset.
-    if (sunSettings.separateElements ? showSunset : combinedSunset) {
-      symbolName = "sunset.fill"
-      timeToShow = sunset
-    }
-
-    // Otherwise, show a sunrise.
-    else {
-      symbolName = "sunrise.fill"
-      timeToShow = current > sunset ? tomorrow : sunrise
-    }
-
-    // Set up the stack.
-    const sunriseStack = this.align(column)
-    sunriseStack.setPadding(this.padding/2, this.padding, this.padding/2, this.padding)
-    sunriseStack.layoutHorizontally()
-    sunriseStack.centerAlignContent()
-
-    sunriseStack.addSpacer(this.padding * 0.3)
-
-    // Add the correct symbol.
-    const symbol = sunriseStack.addImage(SFSymbol.named(symbolName).image)
-    symbol.imageSize = new Size(22,22)
-    this.tintIcon(symbol, this.format.sunrise)
-
-    sunriseStack.addSpacer(this.padding)
-
-    // Add the time.
-    const timeText = this.formatTime(new Date(timeToShow))
-    const time = this.provideText(timeText, sunriseStack, this.format.sunrise)
-  },
-
-  // Allow for either term to be used.
-  async sunset(column) {
-    return await this.sunrise(column, true)
-  },
-
   // Add custom text to the column.
   text(column, input) {
     
@@ -2107,43 +1966,6 @@ const weatherCal = {
     const textStack = this.align(column)
     textStack.setPadding(this.padding, this.padding, this.padding, this.padding)
     const textDisplay = this.provideText(input, textStack, this.format.customText)
-
-  },
-
-  // Display COVID info on the widget.
-  async covid(column) {
-
-    // Requirements: sunrise
-    if (!this.data.covid) { await this.setupCovid() }
-
-    // Get the sunrise data and settings.
-    const covidData = this.data.covid
-    const covidSettings = this.settings.covid
-
-    // Set up the stack.
-    const covidStack = this.align(column)
-    covidStack.setPadding(this.padding/2, this.padding, this.padding/2, this.padding)
-    covidStack.layoutHorizontally()
-    covidStack.centerAlignContent()
-    covidStack.url = covidSettings.url
-
-    covidStack.addSpacer(this.padding * 0.3)
-
-    // Add the correct symbol.
-    const symbol = covidStack.addImage(SFSymbol.named("bandage").image)
-    symbol.imageSize = new Size(18,18)
-    this.tintIcon(symbol,this.format.covid,true)
-
-    covidStack.addSpacer(this.padding)
-
-    // Add the COVID information.
-    const locale = this.locale
-    const covidText = this.localization.covid.replace(/{(.*?)}/g, (match, $1) => {
-      let val = covidData[$1]
-      if (val) val = new Intl.NumberFormat(locale.replace('_','-')).format(val)
-      return val || ""
-    })
-    this.provideText(covidText, covidStack, this.format.covid)
 
   },
 
@@ -2544,11 +2366,6 @@ const weatherCal = {
           val: "h",
           name: "Duration label for hours",
         },
-        covid: {
-          val: "{cases} cases, {deaths} deaths, {recovered} recoveries",
-          name: "COVID data text",
-          description: "Each {token} is replaced with the number from the data. The available tokens are: cases, todayCases, deaths, todayDeaths, recovered, active, critical, casesPerOneMillion, deathsPerOneMillion, totalTests, testsPerOneMillion"
-        },
         week: {
           val: "Week",
           name: "Label for the week number",
@@ -2646,16 +2463,6 @@ const weatherCal = {
         battery:     {
           val: { size: "14", color: "", font: "medium" },
           name: "Battery percentage",
-          type: "multival",
-        },
-        sunrise:     {
-          val: { size: "14", color: "", font: "medium" },
-          name: "Sunrise and sunset",
-          type: "multival",
-        },
-        covid:       {
-          val: { size: "14", color: "", font: "medium" },
-          name: "COVID data",
           type: "multival",
         },
         week:        {
@@ -2911,18 +2718,6 @@ const weatherCal = {
           val: "",
           name: "URL to open when daily weather is tapped",
           description: "Optionally provide a URL to open when this item is tapped. Leave blank for the default.",
-        }, 
-      },
-
-      covid: {
-        name: "COVID data",
-        country: {
-          val: "USA",
-          name: "Country for COVID information",
-        }, 
-        url: {
-          val: "https://covid19.who.int",
-          name: "URL to open when the COVID data is tapped",
         }, 
       },
       
