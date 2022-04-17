@@ -1944,8 +1944,7 @@ const weatherCal = {
 
   // Determines if the provided date is at night.
   isNight(dateInput) {
-    const timeValue = dateInput.getTime()
-    const hours = timeValue.getHours()
+    const hours = dateInput.getHours()
     return (hours < 6) || (hours > 20)
   },
 
