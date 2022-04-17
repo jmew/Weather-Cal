@@ -644,25 +644,6 @@ const weatherCal = {
     } else if (background.type == "color") {
       this.widget.backgroundColor = new Color(background.color)
 
-    } else if (background.type == "auto") {
-      const gradient = new LinearGradient()
-      const gradientSettings = await this.setupGradient()
-
-      gradient.colors = gradientSettings.color()
-      gradient.locations = gradientSettings.position()
-
-      this.widget.backgroundGradient = gradient
-
-    } else if (background.type == "gradient") {
-      const gradient = new LinearGradient()
-      const initialColor = new Color(background.initialColor)
-      const finalColor = new Color(background.finalColor)
-
-      gradient.colors = [initialColor, finalColor]
-      gradient.locations = [0, 1]
-
-      this.widget.backgroundGradient = gradient
-
     } else if (background.type == "image") {
 
       // Determine if our image exists.
@@ -1106,70 +1087,6 @@ const weatherCal = {
 
     // Store the data.
     this.data.reminders.all = reminders
-  },
-
-  // Set up the gradient for the widget background.
-  async setupGradient() {
-
-    // Requirements: sunrise
-    if (!this.data.sun) { await this.setupSunrise() }
-
-    let gradient = {
-      dawn: {
-        color() { return [new Color("142C52"), new Color("1B416F"), new Color("62668B")] },
-        position() { return [0, 0.5, 1] },
-      },
-
-      sunrise: {
-        color() { return [new Color("274875"), new Color("766f8d"), new Color("f0b35e")] },
-        position() { return [0, 0.8, 1.5] },
-      },
-
-      midday: {
-        color() { return [new Color("3a8cc1"), new Color("90c0df")] },
-        position() { return [0, 1] },
-      },
-
-      noon: {
-        color() { return [new Color("b2d0e1"), new Color("80B5DB"), new Color("3a8cc1")] },
-        position() { return [-0.2, 0.2, 1.5] },
-      },
-
-      sunset: {
-        color() { return [new Color("32327A"), new Color("662E55"), new Color("7C2F43")] },
-        position() { return [0.1, 0.9, 1.2] },
-      },
-
-      twilight: {
-        color() { return [new Color("021033"), new Color("16296b"), new Color("414791")] },
-        position() { return [0, 0.5, 1] },
-      },
-
-      night: {
-        color() { return [new Color("16296b"), new Color("021033"), new Color("021033"), new Color("113245")] },
-        position() { return [-0.5, 0.2, 0.5, 1] },
-      },
-    }
-
-    const sunrise = this.data.sun.sunrise
-    const sunset = this.data.sun.sunset
-
-    // Use sunrise or sunset if we're within 30min of it.
-    if (this.closeTo(sunrise)<=15) { return gradient.sunrise }
-    if (this.closeTo(sunset)<=15) { return gradient.sunset }
-
-    // In the 30min before/after, use dawn/twilight.
-    if (this.closeTo(sunrise)<=45 && this.now.getTime() < sunrise) { return gradient.dawn }
-    if (this.closeTo(sunset)<=45 && this.now.getTime() > sunset) { return gradient.twilight }
-
-    // Otherwise, if it's night, return night.
-    if (this.isNight(this.now)) { return gradient.night }
-
-    // If it's around noon, the sun is high in the sky.
-    if (this.now.getHours() == 12) { return gradient.noon }
-
-    // Otherwise, return the "typical" theme.
-    return gradient.midday
   },
 
   // Set up the location data object.
@@ -2028,7 +1945,8 @@ const weatherCal = {
   // Determines if the provided date is at night.
   isNight(dateInput) {
     const timeValue = dateInput.getTime()
-    return (timeValue < this.data.sun.sunrise) || (timeValue > this.data.sun.sunset)
+    const hours = timeValue.getHours()
+    return (hours < 6) || (hours > 20)
   },
 
   // Determines if two dates occur on the same day.
@@ -2620,21 +2538,6 @@ const weatherCal = {
           name: "URL to open when tapped",
           description: "Optionally provide a URL to open when this item is tapped. Leave blank to open the built-in Reminders app.",
         }, 
-      },
-
-      sunrise: {
-        name: "Sunrise and sunset",
-        showWithin: {
-          val: "",
-          name: "Limit times displayed",
-          description: "Set how many minutes before/after sunrise or sunset to show this element. Leave blank to always show.",
-        }, 
-        separateElements: {
-          val: false,
-          name: "Use separate sunrise and sunset elements",
-          description: "By default, the sunrise element changes between sunrise and sunset times automatically. Set to true for individual, hard-coded sunrise and sunset elements.",
-          type: "bool",
-        },
       },
 
       weather: {
