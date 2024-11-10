@@ -1309,6 +1309,7 @@ const weatherCal = {
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
+        await this.generateAlert("HELP: " + weatherDataRaw.toString());
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
     }
