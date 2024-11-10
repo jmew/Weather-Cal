@@ -1,4 +1,4 @@
-// Variables used by Scriptable.
+X// Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-purple; icon-glyph: calendar;
 
@@ -1179,8 +1179,9 @@ const weatherCal = {
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
+        throw new Error("HELP: " + weatherDataRaw.toString());
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-      } catch {}
+      } catch {console.error(e)}
     }
 
     // If it's an error, treat it as a null value.
