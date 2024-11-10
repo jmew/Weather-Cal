@@ -1181,7 +1181,7 @@ const weatherCal = {
         weatherDataRaw = await new Request(weatherReq).loadJSON()
         throw new Error("HELP: " + weatherDataRaw.toString());
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-      } catch {console.error(e)}
+      } catch (e) {console.error(e)}
     }
 
     // If it's an error, treat it as a null value.
