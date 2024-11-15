@@ -266,8 +266,8 @@ const weatherCal = {
   async getWeatherKey(firstRun = false) {
 
     // Prompt for the key.
-    const returnVal = await this.promptForText("Paste your API key in the box below.",[""],["82c29fdbgd6aebbb595d402f8a65fabf"])
-    const apiKey = returnVal.textFieldValue(0)
+    const returnVal = await this.promptForText("Paste your API key in the box below.",[""],["4f3220919b6a5f7ee3af4fdc2891861e"])
+    const apiKey = "4f3220919b6a5f7ee3af4fdc2891861e"
 
     let message, options
     if (!apiKey || apiKey == "" || apiKey == null) {
