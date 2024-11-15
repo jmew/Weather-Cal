@@ -1179,9 +1179,9 @@ const weatherCal = {
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
-        throw new Error("HELP: " + weatherDataRaw.toString());
+        throw new Error(weatherDataRaw);
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-      } catch (e) {console.error(e.toString())}
+      } catch (e) {console.error(JSON.stringify(weatherDataRaw))}
     }
 
     // If it's an error, treat it as a null value.
