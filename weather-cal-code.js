@@ -1175,12 +1175,13 @@ const weatherCal = {
 
       const apiKeyPath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-api-key")
       // const apiKey = this.fm.readString(apiKeyPath)
+      
       const apiKey = "4f3220919b6a5f7ee3af4fdc2891861e"
+      throw new Error(this.fm.readString(apiKeyPath))
 
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
-        throw new Error(weatherDataRaw);
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch (e) {console.error(JSON.stringify(weatherDataRaw))}
     }
