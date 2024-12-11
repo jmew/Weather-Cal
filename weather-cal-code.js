@@ -1151,7 +1151,7 @@ const weatherCal = {
     let weatherDataRaw
 
     // If cache exists and it's been less than 60 seconds since last request, use cached data.
-    if (false && cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
+    if (cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
       const cache = this.fm.readString(cachePath)
       weatherDataRaw = JSON.parse(cache)
       // if cache is null, then fetch weather
@@ -1191,7 +1191,8 @@ const weatherCal = {
     await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
-    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
+    await this.generateAlert(typeof weatherDataRaw, [])
+    await this.generateAlert(weatherDataRaw.cod, [])
     // English continues using the "main" weather description.
     const english = (this.locale.split("_")[0] == "en")
 
