@@ -13,7 +13,7 @@ To update, run a Weather Cal widget script.
 In the popup, tap "Update code". 
 It will update to the newest version.
 
-~
+~g
 
 */
 
@@ -1185,7 +1185,7 @@ const weatherCal = {
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
         throw new Error(weatherDataRaw)
       } catch (e) {throw new Error(JSON.stringify(e))}
-    }x
+    }
 
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
