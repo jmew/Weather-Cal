@@ -1184,8 +1184,8 @@ const weatherCal = {
         weatherDataRaw = await new Request(weatherReq).loadJSON()
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
         throw new Error(weatherDataRaw)
-      } catch (e) {console.error(JSON.stringify(weatherDataRaw))}
-    }
+      } catch (e) {throw new Error(JSON.stringify(e))}
+    }x
 
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
