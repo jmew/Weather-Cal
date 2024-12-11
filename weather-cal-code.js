@@ -1189,7 +1189,7 @@ const weatherCal = {
 
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
-
+    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // English continues using the "main" weather description.
     const english = (this.locale.split("_")[0] == "en")
 
@@ -1202,6 +1202,8 @@ const weatherCal = {
     this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.daily[0].temp.min : null
     this.data.weather.forecast = []
     this.data.weather.hourly = []
+
+    await this.generateAlert(JSON.stringify(this.data.weather), [])
 
     for (let i=0; i <= 7; i++) {
       this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
