@@ -1151,9 +1151,10 @@ const weatherCal = {
     let weatherDataRaw
 
     // If cache exists and it's been less than 60 seconds since last request, use cached data.
-    if (cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
+    if (false && cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
       const cache = this.fm.readString(cachePath)
       weatherDataRaw = JSON.parse(cache)
+      // if cache is null, then fetch weather
       await this.generateAlert("Cache Exists: " + JSON.stringify(weatherDataRaw), []) 
 
     // Otherwise, use the API to get new weather data.
@@ -1184,10 +1185,10 @@ const weatherCal = {
         const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-        await this.generateAlert(JSON.stringify(weatherDataRaw), [])
+        await this.generateAlert("Fetched weather data", [])
       } catch {}
     }
-
+    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
     await this.generateAlert(JSON.stringify(weatherDataRaw), [])
