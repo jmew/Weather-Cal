@@ -1190,8 +1190,7 @@ const weatherCal = {
     }
     await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
-    if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
-    await this.generateAlert(typeof weatherDataRaw, [])
+    if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null) { weatherDataRaw = null } //|| weatherDataRaw.cod
     await this.generateAlert(weatherDataRaw.cod, [])
     // English continues using the "main" weather description.
     const english = (this.locale.split("_")[0] == "en")
