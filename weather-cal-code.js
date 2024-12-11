@@ -1154,6 +1154,7 @@ const weatherCal = {
     if (cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
       const cache = this.fm.readString(cachePath)
       weatherDataRaw = JSON.parse(cache)
+      await this.generateAlert("Cache Exists: " + JSON.stringify(weatherDataRaw), []) 
 
     // Otherwise, use the API to get new weather data.
     } else {
