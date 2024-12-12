@@ -1201,7 +1201,7 @@ const weatherCal = {
     // Store the weather values.
     this.data.weather = {}
     this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.main.temp : null
-    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.main.weather[0].id : 100
+    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.weather[0].id : 100
     this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.weather[0].main : weatherDataRaw.weather[0].description) : "--"
     this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp.max : null
     this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp.min : null
