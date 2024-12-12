@@ -1200,22 +1200,22 @@ const weatherCal = {
 
     // Store the weather values.
     this.data.weather = {}
-    this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.current.temp : null
-    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.current.weather[0].id : 100
-    this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.current.weather[0].main : weatherDataRaw.current.weather[0].description) : "--"
-    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.daily[0].temp.max : null
-    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.daily[0].temp.min : null
+    this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.main.temp : null
+    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.main.weather[0].id : 100
+    this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.weather[0].main : weatherDataRaw.weather[0].description) : "--"
+    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp.max : null
+    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp.min : null
     this.data.weather.forecast = []
     this.data.weather.hourly = []
 
     await this.generateAlert(JSON.stringify(this.data.weather), [])
 
-    for (let i=0; i <= 7; i++) {
-      this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
-      this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.hourly[i].temp, Condition: weatherDataRaw.hourly[i].weather[0].id}) : { Temp: null, Condition: 100 }
-    }
-    this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
-    this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
+    // for (let i=0; i <= 7; i++) {
+    //   this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
+    //   this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.hourly[i].temp, Condition: weatherDataRaw.hourly[i].weather[0].id}) : { Temp: null, Condition: 100 }
+    // }
+    // this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
+    // this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
   /*
    * WIDGET ITEMS
