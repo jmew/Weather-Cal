@@ -1155,7 +1155,7 @@ const weatherCal = {
       const cache = this.fm.readString(cachePath)
       weatherDataRaw = JSON.parse(cache)
       // if cache is null, then fetch weather
-      await this.generateAlert("Cache Exists: " + JSON.stringify(weatherDataRaw), []) 
+      // await this.generateAlert("Cache Exists: " + JSON.stringify(weatherDataRaw), []) 
 
     // Otherwise, use the API to get new weather data.
     } else {
@@ -1185,14 +1185,12 @@ const weatherCal = {
         const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-        await this.generateAlert("Fetched weather data", [])
+        // await this.generateAlert("Fetched weather data", [])
       } catch {}
     }
-    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
+    // await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null) { 
-      await this.generateAlert("Is it null? " + typeof weatherDataRaw === 'undefined', [])
-      await this.generateAlert("Became undefined", [])
       weatherDataRaw = null
     } //|| weatherDataRaw.cod
     // English continues using the "main" weather description.
@@ -1203,12 +1201,12 @@ const weatherCal = {
     this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.main.temp : null
     this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.weather[0].id : 100
     this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.weather[0].main : weatherDataRaw.weather[0].description) : "--"
-    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp.max : null
-    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp.min : null
+    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp_max : null
+    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp_min : null
     this.data.weather.forecast = []
     this.data.weather.hourly = []
 
-    await this.generateAlert(JSON.stringify(this.data.weather), [])
+    // await this.generateAlert(JSON.stringify(this.data.weather), [])
 
     // for (let i=0; i <= 7; i++) {
     //   this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
