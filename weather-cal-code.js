@@ -1200,13 +1200,12 @@ const weatherCal = {
     this.data.weather = {}
     this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.main.temp : null
     this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.weather[0].id : 100
-    this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.weather[0].main : weatherDataRaw.weather[0].description) : "--"
     this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp_max : null
     this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp_min : null
     this.data.weather.forecast = []
     this.data.weather.hourly = []
 
-    // await this.generateAlert(JSON.stringify(this.data.weather), [])
+    await this.generateAlert(this.data.weather.currentCondition), [])
 
     // for (let i=0; i <= 7; i++) {
     //   this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
@@ -1558,6 +1557,8 @@ const weatherCal = {
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
     let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(this.now)))
+    await this.generateAlert(weatherData.currentCondition),[])
+    //TODO
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
