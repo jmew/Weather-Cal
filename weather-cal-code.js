@@ -1493,6 +1493,8 @@ const weatherCal = {
         continue 
       }
 
+      if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { continue }
+
       // Format with the relative style if set.
       let timeText
       if (reminderSettings.useRelativeDueDate) {
