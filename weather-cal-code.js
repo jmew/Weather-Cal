@@ -1179,13 +1179,16 @@ const weatherCal = {
       const apiKey = "4f3220919b6a5f7ee3af4fdc2891861e"
       // const apiKey = this.fm.readString(apiKeyPath)
 
-      // throw new Error(this.fm.readString(apiKeyPath))
-
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
-        weatherDataRaw = await new Request(weatherReq).loadJSON()
-        this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
-        // await this.generateAlert("Fetched weather data", [])
+        currentDataRaw = await new Request(weatherReq).loadJSON()
+
+        const hourlyReq = "https://api.openweathermap.org/data/2.5/forecast/hourly?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
+        hourlyDataRaw = await new Request(hourlyReq).loadJSON()
+
+        const weatherDataRaw = JSON.stringify({...JSON.parse(currentDataRaw), ...JSON.parse(hourlyDataRaw)})
+
+        this.fm.writeString(cachePath, JSON.stringify(combinedWeatherRaw))
       } catch {}
     }
     // await this.generateAlert(JSON.stringify(weatherDataRaw), [])
@@ -1202,15 +1205,13 @@ const weatherCal = {
     this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.weather[0].id : 100
     this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp_max : null
     this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp_min : null
-    this.data.weather.forecast = []
     this.data.weather.hourly = []
 
     await this.generateAlert(this.data.weather.currentCondition), [])
 
-    // for (let i=0; i <= 7; i++) {
-    //   this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
-    //   this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.hourly[i].temp, Condition: weatherDataRaw.hourly[i].weather[0].id}) : { Temp: null, Condition: 100 }
-    // }
+    for (let i=0; i <= 7; i++) {
+      this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.list[i].main.temp, Condition: weatherDataRaw.list[i].main.weather[0].id}) : { Temp: null, Condition: 100 }
+    }
     // this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
     // this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
