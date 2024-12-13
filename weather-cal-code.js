@@ -1182,13 +1182,12 @@ const weatherCal = {
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         currentDataRaw = await new Request(weatherReq).loadJSON()
-        await this.generateAlert("GOT HERE 1", [])
 
         const hourlyReq = "https://api.openweathermap.org/data/2.5/forecast/hourly?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         hourlyDataRaw = await new Request(hourlyReq).loadJSON()
-        await this.generateAlert("GOT HERE 2", [])
+        // await this.generateAlert("GOT HERE 2", [])
 
-        const weatherDataRaw = JSON.stringify({...JSON.parse(currentDataRaw), ...JSON.parse(hourlyDataRaw)})
+        weatherDataRaw = JSON.stringify({...JSON.parse(currentDataRaw), ...JSON.parse(hourlyDataRaw)})
 
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
@@ -1213,7 +1212,6 @@ const weatherCal = {
     for (let i=0; i <= 7; i++) {
       this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.list[i].main.temp, Condition: weatherDataRaw.list[i].main.weather[0].id}) : { Temp: null, Condition: 100 }
     }
-    // this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
     // this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
   /*
