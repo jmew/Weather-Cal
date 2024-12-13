@@ -1187,7 +1187,7 @@ const weatherCal = {
         hourlyDataRaw = await new Request(hourlyReq).loadJSON()
         // await this.generateAlert("GOT HERE 2", [])
 
-        weatherDataRaw = JSON.stringify({...JSON.parse(currentDataRaw), ...JSON.parse(hourlyDataRaw)})
+        weatherDataRaw = { ...currentDataRaw, ...hourlyDataRaw }
 
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
