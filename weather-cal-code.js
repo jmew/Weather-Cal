@@ -1492,7 +1492,7 @@ const weatherCal = {
       }
 
       if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
-        await this.generateAlert(reminder.toString(),[])
+        await this.generateAlert(`Number of reminders: ${reminders.length}`, [])
         reminders.splice(i, 1)
         continue
       }
