@@ -1492,9 +1492,10 @@ const weatherCal = {
       }
 
       if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
-            reminders.splice(i, 1)
-            continue 
-        }
+        await this.generateAlert(reminder.toString(),[])
+        reminders.splice(i, 1)
+        continue
+      }
 
       // Format with the relative style if set.
       let timeText
