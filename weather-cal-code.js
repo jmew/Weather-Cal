@@ -1190,11 +1190,11 @@ const weatherCal = {
 
         const weatherDataRaw = JSON.stringify({...JSON.parse(currentDataRaw), ...JSON.parse(hourlyDataRaw)})
 
-        this.fm.writeString(cachePath, JSON.stringify(combinedWeatherRaw))
+        this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
     }
 
-    await this.generateAlert(JSON.stringify(combinedWeatherRaw), [])
+    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
     if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null) { 
       weatherDataRaw = null
