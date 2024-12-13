@@ -1559,8 +1559,6 @@ const weatherCal = {
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
     let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(this.now)))
-    await this.generateAlert(weatherData.currentCondition),[])
-    //TODO
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
