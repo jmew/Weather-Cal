@@ -1459,6 +1459,10 @@ const weatherCal = {
       const reminder = reminders[i]
       const bottomPadding = (this.padding-10 < 0) ? 0 : this.padding-10
 
+      if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
+        continue
+      }
+
       const titleStack = this.align(reminderStack)
       titleStack.layoutHorizontally()
       const showCalendarColor = reminderSettings.showListColor
@@ -1488,12 +1492,6 @@ const weatherCal = {
       if (reminder.isOverdue) { 
         title.textColor = Color.red()
         continue 
-      }
-
-      if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
-        await this.generateAlert(`Number of reminders: ${reminders.length}`, [])
-        reminders.splice(i, 1)
-        continue
       }
 
       // Format with the relative style if set.
