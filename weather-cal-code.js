@@ -1181,13 +1181,12 @@ const weatherCal = {
 
       try {
         const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
-        currentDataRaw = await new Request(weatherReq).loadJSON()
+        weatherDataRaw = await new Request(weatherReq).loadJSON()
 
-        const hourlyReq = "https://api.openweathermap.org/data/2.5/forecast/hourly?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
-        hourlyDataRaw = await new Request(hourlyReq).loadJSON()
-        // await this.generateAlert("GOT HERE 2", [])
+        // const hourlyReq = "https://api.openweathermap.org/data/2.5/forecast/hourly?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
+        // hourlyDataRaw = await new Request(hourlyReq).loadJSON()
 
-        weatherDataRaw = { ...currentDataRaw, ...hourlyDataRaw }
+        // weatherDataRaw = { ...currentDataRaw, ...hourlyDataRaw }
 
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
