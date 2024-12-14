@@ -1209,7 +1209,7 @@ const weatherCal = {
     this.data.weather.hourly = []
 
     for (let i=0; i <= 7; i++) {
-      this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.list[i].main.temp, Condition: weatherDataRaw.list[i].main.weather[0].id}) : { Temp: null, Condition: 100 }
+      this.data.weather.hourly[i] = (weatherDataRaw && weatherDataRaw.list) ? ({Temp: weatherDataRaw.list[i].main.temp, Condition: weatherDataRaw.list[i].main.weather[0].id}) : { Temp: null, Condition: 100 }
     }
     // this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
