@@ -1947,9 +1947,15 @@ const weatherCal = {
   },
 
   // Determines if the provided date is at night.
-  isNight(dateInput) {
-    const hours = dateInput.getHours()
-    return (hours < 6) || (hours > 20)
+  async isNight(dateInput) {
+    if (!this.data.location) { await this.setupLocation() }
+    const location = this.data.location
+
+    const sunData = await new Request(`https://api.sunrise-sunset.org/json?lat=${location.latitude}&lng=${location.longitude}&formatted=0`).loadJSON()
+    const sunrise = new Date(sunData.results.sunrise)
+    const sunset = new Date(sunData.results.sunset)
+
+    return dateInput < sunrise || dateInput > sunset
   },
 
   // Determines if two dates occur on the same day.
@@ -2051,6 +2057,30 @@ const weatherCal = {
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
 
+    // const iconMap = {
+    //   "01d": "bi-brightness-high",     // clear sky (day)
+    //   "01n": "bi-moon-stars",          // clear sky (night)
+    //   "02d": "bi-cloud-sun",           // few clouds (day)
+    //   "02n": "bi-cloud-moon",          // few clouds (night)
+    //   "03d": "bi-cloud",               // scattered clouds (day)
+    //   "03n": "bi-cloud",               // scattered clouds (night)
+    //   "04d": "bi-clouds",              // broken clouds (day)
+    //   "04n": "bi-clouds",              // broken clouds (night)
+    //   "09d": "bi-cloud-drizzle",       // shower rain (day)
+    //   "09n": "bi-cloud-drizzle",       // shower rain (night)
+    //   "10d": "bi-cloud-rain",          // rain (day)
+    //   "10n": "bi-cloud-rain",          // rain (night)
+    //   "11d": "bi-cloud-lightning-rain",// thunderstorm (day)
+    //   "11n": "bi-cloud-lightning-rain",// thunderstorm (night)
+    //   "13d": "bi-cloud-snow",          // snow (day)
+    //   "13n": "bi-cloud-snow",          // snow (night)
+    //   "50d": "bi-cloud-fog",           // mist (day)
+    //   "50n": "bi-cloud-fog"            // mist (night)
+    // };
+    
+    // // Return the mapped icon if it exists; otherwise, fall back to a default icon.
+    // return iconMap[iconCode] || "bi-exclamationmark.circle";
+  
     // Define our symbol equivalencies.
     let symbols = {
 
