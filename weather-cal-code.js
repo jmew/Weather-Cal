@@ -1452,6 +1452,10 @@ const weatherCal = {
       const reminder = reminders[i]
       const bottomPadding = (this.padding-10 < 0) ? 0 : this.padding-10
 
+      if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
+        continue
+      }
+
       const titleStack = this.align(reminderStack)
       titleStack.layoutHorizontally()
       const showCalendarColor = reminderSettings.showListColor
