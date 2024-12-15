@@ -13,7 +13,7 @@ To update, run a Weather Cal widget script.
 In the popup, tap "Update code". 
 It will update to the newest version.
 
-~g
+~
 
 */
 
@@ -266,8 +266,8 @@ const weatherCal = {
   async getWeatherKey(firstRun = false) {
 
     // Prompt for the key.
-    const returnVal = await this.promptForText("Paste your API key in the box below.",[""],["4f3220919b6a5f7ee3af4fdc2891861e"])
-    const apiKey = "4f3220919b6a5f7ee3af4fdc2891861e"
+    const returnVal = await this.promptForText("Paste your API key in the box below.",[""],["82c29fdbgd6aebbb595d402f8a65fabf"])
+    const apiKey = returnVal.textFieldValue(0)
 
     let message, options
     if (!apiKey || apiKey == "" || apiKey == null) {
@@ -1154,8 +1154,6 @@ const weatherCal = {
     if (cacheExists && (this.now.getTime() - cacheDate.getTime()) < 60000) {
       const cache = this.fm.readString(cachePath)
       weatherDataRaw = JSON.parse(cache)
-      // if cache is null, then fetch weather
-      // await this.generateAlert("Cache Exists: " + JSON.stringify(weatherDataRaw), []) 
 
     // Otherwise, use the API to get new weather data.
     } else {
@@ -1175,43 +1173,38 @@ const weatherCal = {
         }
       }
 
-      const apiKeyPath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-api-key")      
-      const apiKey = "4f3220919b6a5f7ee3af4fdc2891861e"
-      // const apiKey = this.fm.readString(apiKeyPath)
+      const apiKeyPath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-api-key")
+      const apiKey = this.fm.readString(apiKeyPath)
 
       try {
-        const weatherReq = "https://api.openweathermap.org/data/2.5/weather?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
+        const weatherReq = "https://api.openweathermap.org/data/3.0/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
-
-        // const hourlyReq = "https://api.openweathermap.org/data/2.5/forecast/hourly?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
-        // hourlyDataRaw = await new Request(hourlyReq).loadJSON()
-
-        // weatherDataRaw = { ...currentDataRaw, ...hourlyDataRaw }
-
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
     }
 
-    await this.generateAlert(JSON.stringify(weatherDataRaw), [])
     // If it's an error, treat it as a null value.
-    if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null) { 
-      weatherDataRaw = null
-    } //|| weatherDataRaw.cod
+    if (typeof weatherDataRaw === 'undefined' || weatherDataRaw == null || weatherDataRaw.cod) { weatherDataRaw = null }
+
     // English continues using the "main" weather description.
     const english = (this.locale.split("_")[0] == "en")
 
     // Store the weather values.
     this.data.weather = {}
-    this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.main.temp : null
-    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.weather[0].id : 100
-    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.main.temp_max : null
-    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.main.temp_min : null
+    this.data.weather.currentTemp = weatherDataRaw ? weatherDataRaw.current.temp : null
+    this.data.weather.currentCondition = weatherDataRaw ? weatherDataRaw.current.weather[0].id : 100
+    this.data.weather.currentDescription = weatherDataRaw ? (english ? weatherDataRaw.current.weather[0].main : weatherDataRaw.current.weather[0].description) : "--"
+    this.data.weather.todayHigh = weatherDataRaw ? weatherDataRaw.daily[0].temp.max : null
+    this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.daily[0].temp.min : null
+    this.data.weather.forecast = []
     this.data.weather.hourly = []
 
     for (let i=0; i <= 7; i++) {
-      this.data.weather.hourly[i] = (weatherDataRaw && weatherDataRaw.list) ? ({Temp: weatherDataRaw.list[i].main.temp, Condition: weatherDataRaw.list[i].main.weather[0].id}) : { Temp: null, Condition: 100 }
+      this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
+      this.data.weather.hourly[i] = weatherDataRaw ? ({Temp: weatherDataRaw.hourly[i].temp, Condition: weatherDataRaw.hourly[i].weather[0].id}) : { Temp: null, Condition: 100 }
     }
-    // this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
+    this.data.weather.tomorrowRain = weatherDataRaw ? weatherDataRaw.daily[1].pop : null
+    this.data.weather.nextHourRain = weatherDataRaw ? weatherDataRaw.hourly[1].pop : null
   },
   /*
    * WIDGET ITEMS
@@ -1458,10 +1451,6 @@ const weatherCal = {
 
       const reminder = reminders[i]
       const bottomPadding = (this.padding-10 < 0) ? 0 : this.padding-10
-
-      if (reminder.dueDate && this.dateDiff(this.now, reminder.dueDate) > 2) { 
-        continue
-      }
 
       const titleStack = this.align(reminderStack)
       titleStack.layoutHorizontally()
