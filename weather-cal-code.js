@@ -1552,7 +1552,7 @@ const weatherCal = {
 
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
-    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(this.now)))
+    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(new Date())))
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
@@ -1955,10 +1955,10 @@ const weatherCal = {
     const sunrise = new Date(sunData.results.sunrise)
     const sunset = new Date(sunData.results.sunset)
 
-    await this.generateAlert("sunrise: " + sunrise.toString(), []) //12/15 15:49
-    await this.generateAlert("sunSet: " + sunset.toString(), []) //12/16 00:20
-    await this.generateAlert("dateInput: " + dateInput.toString(), []) //Sun Dec 15 7:51:25 PST
-    await this.generateAlert("newDate: " + (new Date()).toString(), []) //Sun Dec 15 7:51:25 PST
+    // await this.generateAlert("sunrise: " + sunrise.toString(), []) //12/15 15:49
+    // await this.generateAlert("sunSet: " + sunset.toString(), []) //12/16 00:20
+    // await this.generateAlert("dateInput: " + dateInput.toString(), []) //Sun Dec 15 7:51:25 PST
+    // await this.generateAlert("newDate: " + (new Date()).toString(), []) //Sun Dec 15 7:51:25 PST
 
     return dateInput < sunrise || dateInput > sunset
   },
