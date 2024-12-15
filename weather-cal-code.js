@@ -1955,9 +1955,10 @@ const weatherCal = {
     const sunrise = new Date(sunData.results.sunrise)
     const sunset = new Date(sunData.results.sunset)
 
-    await this.generateAlert(sunData.results.sunrise, [])
-    await this.generateAlert(sunData.results.sunset, [])
-    await this.generateAlert(dateInput.toString(), [])
+    await this.generateAlert("sunrise: " + sunrise.toString(), []) //12/15 15:49
+    await this.generateAlert("sunSet: " + sunset.toString(), []) //12/16 00:20
+    await this.generateAlert("dateInput: " + dateInput.toString(), []) //Sun Dec 15 7:51:25 PST
+    await this.generateAlert("newDate: " + (new Date()).toString(), []) //Sun Dec 15 7:51:25 PST
 
     return dateInput < sunrise || dateInput > sunset
   },
