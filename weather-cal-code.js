@@ -1177,7 +1177,7 @@ const weatherCal = {
       const apiKey = this.fm.readString(apiKeyPath)
 
       try {
-        const weatherReq = "https://api.openweathermap.org/data/3.0/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
+        const weatherReq = "https://api.openweathermap.org/data/3.0/onecall?lat=" + this.data.location.latitude + "&lon=" + this.data.location.longitude + "&exclude=minutely,daily,alerts&units=" + this.settings.widget.units + lang + "&appid=" + apiKey
         weatherDataRaw = await new Request(weatherReq).loadJSON()
         this.fm.writeString(cachePath, JSON.stringify(weatherDataRaw))
       } catch {}
@@ -1709,7 +1709,7 @@ const weatherCal = {
     const [locationData, weatherData] = [this.data.location, this.data.weather]
     const weatherSettings = this.settings.weather
 
-    let startIndex = hourly ? 1 : (weatherSettings.showToday ? 1 : 2)
+    let startIndex = hourly ? 1 : (weatherSettings.showToday ? 1 : 2) //TODO round to closest
     let endIndex = (hourly ? parseInt(weatherSettings.showHours) : parseInt(weatherSettings.showDays)) + startIndex
     if (endIndex > 9) { endIndex = 9 }
 
@@ -1787,7 +1787,7 @@ const weatherCal = {
       
       // Now, set up the container for the condition.
       if (hourly) {
-        let subCondition = conditionStack.addImage(this.provideConditionSymbol(weatherData.hourly[i].Condition, this.isNight(myDate)))
+        let subCondition = conditionStack.addImage(this.provideConditionSymbol(weatherData.hourly[i - 1].Condition, this.isNight(myDate)))
         subCondition.imageSize = new Size(18,18)
         this.tintIcon(subCondition, this.format.smallTemp)
         
@@ -1799,7 +1799,7 @@ const weatherCal = {
         tempStack.layoutHorizontally()
         
         if (horizontal) { tempStack.addSpacer() }
-        const tempText = this.displayNumber(weatherData.hourly[i].Temp,"--") + "°"
+        const tempText = this.displayNumber(weatherData.hourly[i - 1].Temp,"--") + "°"
         const temp = this.provideText(tempText, tempStack, this.format.smallTemp)
         temp.lineLimit = 1
         temp.minimumScaleFactor = 0.75
@@ -1954,11 +1954,6 @@ const weatherCal = {
     const sunData = await new Request(`https://api.sunrise-sunset.org/json?lat=${location.latitude}&lng=${location.longitude}&formatted=0`).loadJSON()
     const sunrise = new Date(sunData.results.sunrise)
     const sunset = new Date(sunData.results.sunset)
-
-    // await this.generateAlert("sunrise: " + sunrise.toString(), []) //12/15 15:49
-    // await this.generateAlert("sunSet: " + sunset.toString(), []) //12/16 00:20
-    // await this.generateAlert("dateInput: " + dateInput.toString(), []) //Sun Dec 15 7:51:25 PST
-    // await this.generateAlert("newDate: " + (new Date()).toString(), []) //Sun Dec 15 7:51:25 PST
 
     return dateInput < sunrise || dateInput > sunset
   },
