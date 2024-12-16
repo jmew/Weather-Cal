@@ -1555,6 +1555,7 @@ const weatherCal = {
     let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(new Date())))
     const isNight = await this.isNight(new Date()) 
     await this.generateAlert(isNight.toString(), []) //TODO REMOVE
+    await this.generateAlert(mainCondition.toString(), []) //TODO REMOVE
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
@@ -2058,7 +2059,7 @@ const weatherCal = {
 
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
-    this.generateAlert("provide symbol fn: " + night.toString(),[])
+    // this.generateAlert("provide symbol fn: " + night.toString(),[])
     // Define our symbol equivalencies.
     let symbols = {
 
