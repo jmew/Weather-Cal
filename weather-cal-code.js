@@ -2059,7 +2059,6 @@ const weatherCal = {
 
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
-    return false
     // Define our symbol equivalencies.
     let symbols = {
 
