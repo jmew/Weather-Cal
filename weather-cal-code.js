@@ -985,7 +985,7 @@ const weatherCal = {
     // Function to determine if an event should be shown.
     function shouldShowEvent(event) {
     
-      const diff = dateDiff(current, event.startDate)
+      const diff = dateDiff(current, event.endDate)
       
       // If it's in the past or too far in the future, don't show it.
       if (diff < 0 || diff > numberOfDays) { return false }
