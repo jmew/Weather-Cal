@@ -1553,10 +1553,7 @@ const weatherCal = {
 
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
-    await this.generateAlert(weatherData.dt.toString(),[])
     let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,await this.isNight(weatherData.dt)))
-    await this.generateAlert(this.isNight(weatherData.dt).toString(),[])
-    await this.generateAlert((await this.isNight(weatherData.dt).toString()),[])
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
@@ -1651,7 +1648,7 @@ const weatherCal = {
     if (showNextHour) {
       const addHour = this.now.getTime() + (60*60*1000)
       const newDate = new Date(addHour)
-      nightCondition = this.isNight(newDate)
+      nightCondition = await this.isNight(newDate)
     } else {
       nightCondition = false 
     }
@@ -1791,7 +1788,7 @@ const weatherCal = {
       
       // Now, set up the container for the condition.
       if (hourly) {
-        let subCondition = conditionStack.addImage(this.provideConditionSymbol(weatherData.hourly[i - 1].Condition, this.isNight(myDate)))
+        let subCondition = conditionStack.addImage(this.provideConditionSymbol(weatherData.hourly[i - 1].Condition, await this.isNight(myDate)))
         subCondition.imageSize = new Size(18,18)
         this.tintIcon(subCondition, this.format.smallTemp)
         
