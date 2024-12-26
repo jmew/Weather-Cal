@@ -1553,6 +1553,7 @@ const weatherCal = {
 
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
+    await this.generateAlert(weatherData.dt.toString(),[])
     let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(weatherData.dt)))
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
@@ -2057,7 +2058,7 @@ const weatherCal = {
 
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
-    // night = false TODOOOOOO
+    night = false
     // Define our symbol equivalencies.
     let symbols = {
 
