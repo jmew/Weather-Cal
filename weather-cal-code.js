@@ -1554,7 +1554,9 @@ const weatherCal = {
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
     await this.generateAlert(weatherData.dt.toString(),[])
-    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(weatherData.dt)))
+    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,await this.isNight(weatherData.dt)))
+    await this.generateAlert(this.isNight(weatherData.dt),[])
+    await this.generateAlert(await this.isNight(weatherData.dt),[])
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
@@ -1957,7 +1959,10 @@ const weatherCal = {
     const sunrise = new Date(sunData.results.sunrise)
     const sunset = new Date(sunData.results.sunset)
 
-    return dateInput < sunrise || dateInput > sunset
+    // Convert dateInput to a Date in case it's a timestamp.
+    const dateToCheck = (typeof dateInput === "number" || typeof dateInput === "string") ? new Date(dateInput * 1000) : dateInput
+
+    return dateToCheck < sunrise || dateToCheck > sunset
   },
 
   // Determines if two dates occur on the same day.
@@ -2058,7 +2063,6 @@ const weatherCal = {
 
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
-    night = false
     // Define our symbol equivalencies.
     let symbols = {
 
