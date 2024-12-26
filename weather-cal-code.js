@@ -1198,6 +1198,7 @@ const weatherCal = {
     this.data.weather.todayLow = weatherDataRaw ? weatherDataRaw.daily[0].temp.min : null
     this.data.weather.forecast = []
     this.data.weather.hourly = []
+    this.data.weather.dt = weatherDataRaw ? new Date(weatherDataRaw.current.dt * 1000) : null
 
     for (let i=0; i <= 7; i++) {
       this.data.weather.forecast[i] = weatherDataRaw ? ({High: weatherDataRaw.daily[i].temp.max, Low: weatherDataRaw.daily[i].temp.min, Condition: weatherDataRaw.daily[i].weather[0].id}) : { High: null, Low: null, Condition: 100 }
@@ -1552,10 +1553,7 @@ const weatherCal = {
 
     // Show the current condition symbol.
     let mainConditionStack = this.align(currentWeatherStack)
-    const curDate = new Date()
-    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(curDate)))
-    // const isNight = await this.isNight(curDate) 
-    // await this.generateAlert(isNight.toString(), []) //TODO REMOVE
+    let mainCondition = mainConditionStack.addImage(this.provideConditionSymbol(weatherData.currentCondition,this.isNight(weatherData.dt)))
     mainCondition.imageSize = new Size(22,22)
     this.tintIcon(mainCondition, this.format.largeTemp)
     mainConditionStack.setPadding(weatherSettings.showLocation ? 0 : this.padding, this.padding, 0, this.padding)
@@ -2059,6 +2057,7 @@ const weatherCal = {
 
   // Provide a symbol based on the condition.
   provideConditionSymbol(cond,night) {
+    // night = false TODOOOOOO
     // Define our symbol equivalencies.
     let symbols = {
 
