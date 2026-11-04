@@ -28,6 +28,8 @@ Setting up Weather Cal is easy:
 
 Existing widgets whose code URL points to `nosunrise` can use **Update code** after changes are merged into that branch. This updates the shared code script; it does not replace each widget's layout or saved OpenWeather key. When offline, Weather Cal uses a valid cached forecast for up to six hours, then shows weather placeholders until a refresh succeeds.
 
+If an older updater repeatedly fails, back up your `Weather Cal code` script, then replace its contents with [the current backend](https://raw.githubusercontent.com/jmew/Weather-Cal/refs/heads/nosunrise/weather-cal-code.js). Keep its name and your separate widget script unchanged. Close and re-run the widget script. The updater now saves a copy of the installed script in Scriptable's library before overwriting it, attempts to restore it if saving fails, and reports which step failed.
+
 On medium and large widgets, tapping an event or reminder opens a link to that item in Apple Calendar or Reminders. A custom URL in the event or reminder preferences overrides these item links. If the code cannot build an item link from its identifier, it uses the event's date or the Reminders app. These Apple URL schemes are undocumented; opening behavior, particularly for recurring events, needs checking on your iOS version. Scriptable may still appear briefly while opening the link.
 
 ![Screenshots showing how to set up Weather Cal](https://github.com/mzeryck/Weather-Cal/blob/main/images/setup.jpg)

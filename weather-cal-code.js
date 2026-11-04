@@ -167,7 +167,7 @@ const weatherCal = {
 
       // Try updating the code.
       const success = await this.downloadCode(codeFilename, gitHubUrl)
-      message = success ? "The update is now complete." : "The update failed. Please try again later."
+      message = success ? "The update is now complete. Close and re-run your widget script to load it." : "The update failed.\n\n" + (this.updateError || "Please try again later.")
       options = ["OK"]
 
       await this.generateAlert(message,options)
@@ -527,7 +527,11 @@ const weatherCal = {
   // Download a Scriptable script.
   async downloadCode(filename, url) {
     const pathToCode = this.fm.joinPath(this.fm.documentsDirectory(), filename + ".js")
-    const temporaryPath = pathToCode + ".download"
+    const backupPath = this.fm.joinPath(this.fm.libraryDirectory(), "weather-cal-script-backup-" + encodeURIComponent(filename) + ".txt")
+    this.updateError = null
+    let stage = "Downloading code"
+    let previousCode
+    let saveStarted = false
 
     try {
       const codeString = await new Request(url).loadString()
@@ -535,14 +539,36 @@ const weatherCal = {
       const complete = isBackend ?
         codeString.includes("async createWidget(") && codeString.includes("async runSetup(") && codeString.includes("module.exports = weatherCal") :
         codeString.includes("Script.setWidget(widget)") && codeString.includes("importModule(codeFilename)")
-      if (!codeString.startsWith("// Variables used by Scriptable.") || !complete) return false
+      if (!codeString.startsWith("// Variables used by Scriptable.") || !complete) {
+        this.updateError = "The downloaded file is not a complete Weather Cal script. Your installed code was kept."
+        return false
+      }
 
-      // Keep the installed script until the complete download has been written.
-      this.fm.writeString(temporaryPath, codeString)
-      this.fm.move(temporaryPath, pathToCode)
+      // Preserve the current script before overwriting it. Avoid moving a temporary
+      // file over an existing iCloud script, which can fail on the device.
+      stage = "Backing up installed code"
+      if (this.fm.fileExists(pathToCode)) {
+        if (this.iCloudInUse && !this.fm.isFileDownloaded(pathToCode)) {
+          await this.fm.downloadFileFromiCloud(pathToCode)
+        }
+        previousCode = this.fm.readString(pathToCode)
+        if (typeof previousCode != "string") throw new Error("Could not read the installed script.")
+        this.fm.writeString(backupPath, previousCode)
+      }
+      stage = "Saving updated code"
+      saveStarted = true
+      this.fm.writeString(pathToCode, codeString)
       return true
-    } catch {
-      if (this.fm.fileExists(temporaryPath)) this.fm.remove(temporaryPath)
+    } catch (error) {
+      this.updateError = stage + " failed: " + (error.message || String(error))
+      if (saveStarted && typeof previousCode == "string") {
+        try {
+          this.fm.writeString(pathToCode, previousCode)
+          this.updateError += "\nYour previous code was restored."
+        } catch {
+          this.updateError += "\nAutomatic restore also failed. Your backup is at: " + backupPath
+        }
+      }
       return false
     }
   },

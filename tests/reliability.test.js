@@ -107,11 +107,48 @@ test('incomplete backend update keeps the installed script', async () => {
 
 test('validated backend update replaces the installed script', async () => {
   const instance = makeCode({ '/documents/Weather Cal code.js': 'old backend' })
-  const newBackend = '// Variables used by Scriptable.\nasync createWidget(\nasync runSetup(\nmodule.exports = weatherCal'
+  const newBackend = fs.readFileSync(path.join(__dirname, '..', 'weather-cal-code.js'), 'utf8')
+  instance.fm.move = () => { throw new Error('Cannot replace existing destination') }
   global.Request = class { async loadString() { return newBackend } }
   assert.equal(await instance.downloadCode('Weather Cal code', 'https://example.test'), true)
   assert.equal(instance.fm.files['/documents/Weather Cal code.js'], newBackend)
   assert.equal(instance.fm.fileExists('/documents/Weather Cal code.js.download'), false)
+  assert.equal(instance.fm.files['/library/weather-cal-script-backup-Weather%20Cal%20code.txt'], 'old backend')
+})
+
+test('backup failure leaves installed script untouched and identifies the failing step', async () => {
+  const instance = makeCode({ '/documents/Weather Cal code.js': 'old backend' })
+  const newBackend = fs.readFileSync(path.join(__dirname, '..', 'weather-cal-code.js'), 'utf8')
+  global.Request = class { async loadString() { return newBackend } }
+  instance.fm.writeString = () => { throw new Error('Storage unavailable') }
+  assert.equal(await instance.downloadCode('Weather Cal code', 'https://example.test'), false)
+  assert.equal(instance.fm.files['/documents/Weather Cal code.js'], 'old backend')
+  assert.match(instance.updateError, /Backing up installed code failed: Storage unavailable/)
+})
+
+test('failed overwrite restores the previous code', async () => {
+  const instance = makeCode({ '/documents/Weather Cal code.js': 'old backend' })
+  const newBackend = fs.readFileSync(path.join(__dirname, '..', 'weather-cal-code.js'), 'utf8')
+  global.Request = class { async loadString() { return newBackend } }
+  const write = instance.fm.writeString.bind(instance.fm)
+  instance.fm.writeString = (file, value) => {
+    if (file == '/documents/Weather Cal code.js' && value == newBackend) {
+      instance.fm.files[file] = 'partial write'
+      throw new Error('Write failed')
+    }
+    write(file, value)
+  }
+  assert.equal(await instance.downloadCode('Weather Cal code', 'https://example.test'), false)
+  assert.equal(instance.fm.files['/documents/Weather Cal code.js'], 'old backend')
+  assert.match(instance.updateError, /previous code was restored/)
+})
+
+test('network failure reports the download step and keeps installed code', async () => {
+  const instance = makeCode({ '/documents/Weather Cal code.js': 'old backend' })
+  global.Request = class { async loadString() { throw new Error('Offline') } }
+  assert.equal(await instance.downloadCode('Weather Cal code', 'https://example.test'), false)
+  assert.equal(instance.fm.files['/documents/Weather Cal code.js'], 'old backend')
+  assert.match(instance.updateError, /Downloading code failed: Offline/)
 })
 
 test('real layout tokens still resolve to widget items', () => {
