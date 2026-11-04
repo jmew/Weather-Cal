@@ -20,11 +20,19 @@ This is a Scriptable widget that lets you display, position, and format multiple
 ## Setup
 Setting up Weather Cal is easy:
 
-1. Copy the code in [weather-cal.js](https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/weather-cal.js). (You don't need to do anything with weather-cal-code.js.)
+1. Copy the code in [weather-cal.js](https://raw.githubusercontent.com/jmew/Weather-Cal/main/weather-cal.js). (You don't need to do anything with weather-cal-code.js.)
 
 2. Paste the code into a new Scriptable script. This is the widget script.
 
 3. Run the script. It will download the code script in the background and walk you through each step of the setup process.
+
+Weather Cal keeps the same OpenWeather API key and selected API path from existing installations. During new setup it tests the available OpenWeather One Call endpoints and saves the one that works. OpenWeather [closed general access to One Call 2.5 in June 2024](https://openweathermap.org/one-call-transfer), so a new key may need a [One Call subscription](https://openweathermap.org/api/one-call-3). Review OpenWeather's current terms before subscribing.
+
+If you already installed Weather Cal, replace the GitHub URL in your widget script with `https://raw.githubusercontent.com/jmew/Weather-Cal/main/weather-cal-code.js`, then run the script and select **Update code**. Existing layouts, preferences, API key, and saved weather API path remain in place. Back up both Scriptable scripts before updating so you can restore your working widget if needed.
+
+When a widget refresh happens without internet, it uses a valid cached forecast for up to six hours. After that, weather values show placeholders until the next successful refresh. The rest of the widget can still render without a cached location or forecast.
+
+Updating the backend requires internet. If the download fails or is incomplete, Weather Cal keeps the installed backend script. A first-time installation still needs a connection to download that script.
 
 ![Screenshots showing how to set up Weather Cal](https://github.com/mzeryck/Weather-Cal/blob/main/images/setup.jpg)
 
@@ -65,7 +73,6 @@ The layout is just a list of [widget items](#widget-items) and [layout items](#s
 You can add the following items to your widget:
  
 - `battery`
-- `covid`
 - `date` 
 - `events` 
 - `greeting`

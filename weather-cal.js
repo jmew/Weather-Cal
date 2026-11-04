@@ -43,7 +43,7 @@ const layout = `
 
 // Names of Weather Cal elements.
 const codeFilename = "Weather Cal code"
-const gitHubUrl = "https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/weather-cal-code.js"
+const gitHubUrl = "https://raw.githubusercontent.com/jmew/Weather-Cal/main/weather-cal-code.js"
 
 // Determine if the user is using iCloud.
 let files = FileManager.local()
@@ -61,7 +61,10 @@ if (!files.fileExists(pathToCode)) {
 }
 
 // Import the code.
-if (iCloudInUse) { await files.downloadFileFromiCloud(pathToCode) }
+if (iCloudInUse) {
+  // A previously downloaded module can still be used when iCloud is offline.
+  try { await files.downloadFileFromiCloud(pathToCode) } catch {}
+}
 const code = importModule(codeFilename)
 
 const custom = {
